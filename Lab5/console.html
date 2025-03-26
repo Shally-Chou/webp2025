@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    
+    <script>
+        function tree(n){
+            printTreeTop(n);
+            printTreeBottom(n);
+        }
+
+        function printTreeTop(n){
+            for (let i = 0; i < n; i++) {
+                console.log(repeatChar(' ', n - i - 1) + repeatChar('*', 2 * i + 1));
+            }
+        }
+
+        function printTreeBottom(n){
+            for (let i = 0; i < 3; i++) {
+                console.log(repeatChar(' ', n - 1) + '*');
+            }
+        }
+
+        function repeatChar(char, n){
+            return char.repeat(n);
+        }
+
+        tree(4); 
+    </script>
+</body>
+</html>
