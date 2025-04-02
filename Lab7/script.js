@@ -19,27 +19,36 @@ function getRandomString(maxChars) {
 // 初始化 container 內容
 function initializeContainer() {
     container.textContent = getRandomString(2);
+    setTimeout(() => container.focus(), 100); // 確保 container 可輸入
 }
 
 // keyup 時，增加新的字元
-function add_new_chars() {
-    container.textContent += getRandomString(3);
+function addNewChars() {
+    const randomLength = Math.floor(Math.random() * 3) + 1; // 產生 1 到 3 的隨機數
+    let newChars = '';
+    for (let i = 0; i < randomLength; i++) {
+        newChars += getRandomChar();
+    }
+    container.textContent += newChars;
 }
 
 // 移除第一個字元
 function removeFirstChar() {
-    container.textContent = container.textContent.slice(1);
+    if (container.textContent.length > 0) {
+        container.textContent = container.textContent.slice(1);
+    }
 }
 
 window.addEventListener("load", initializeContainer);
 
 window.addEventListener("keyup", function(e) {
     console.log(e.key);
+    
+    // 如果輸入的字母與第一個字母匹配，則刪除它
     if (container.textContent.length > 0 && e.key === container.textContent[0]) {
         removeFirstChar();
     }
-    add_new_chars();
+
+    // 無論如何都新增 1-3 個字母
+    addNewChars();
 });
-
-container.focus(); // 確保 container 獲得焦點
-
