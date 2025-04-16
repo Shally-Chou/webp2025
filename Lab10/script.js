@@ -1,51 +1,47 @@
+// 🆕 Flickr 的 API：先拿最近的圖片資訊
 var imglist_Url = 'https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=ca370d51a054836007519a00ff4ce59e&per_page=10&format=json&nojsoncallback=1';
+
+// 🆕 拿指定 id 的圖片真實網址
+var img_Url_base = 'https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=ca370d51a054836007519a00ff4ce59e&format=json&nojsoncallback=1&photo_id=';
 
 function getimg() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', imglist_Url, true); // ⭐ 改成 Flickr 的 URL
+    xhr.open('GET', imglist_Url, true); // 只改這裡的網址
     xhr.send();
-    xhr.onload = function(){
+    xhr.onload = function () {
         var data = JSON.parse(this.responseText);
-        add_new_img(data); // 傳入 Flickr 資料
-    }
+        var photos = data.photos.photo; // 取出照片陣列
+
+        // 一張張去抓真實圖片網址
+        photos.forEach(function (item) {
+            getImageUrl(item.id); // 傳入每張圖的 photo_id
+        });
+    };
 }
 
-function add_new_img(dataset) {
-    var gal = document.getElementById("gallery");
-
-    dataset.photos.photo.forEach(function(photo){ // ⭐ Flickr 資料格式要這樣取
-        var img = document.createElement("img");
-
-        // ⭐ Flickr 圖片網址格式：
-        // https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}_m.jpg
-        var src = `https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_m.jpg`;
-
-        img.setAttribute("src", src);
-        gal.appendChild(img);
-    });
-}
-
-
-/*var dataUrl = 'https://api.unsplash.com/photos?client_id=812193ef71ca946e361ed541979a0cfd91e9419a19235fd05f51ea14233f020a&per_page=30';
-var imglist_Url = 'https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=ca370d51a054836007519a00ff4ce59e&per_page=10&format=json&nojsoncallback=1'; 
-var img_Url = 'https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=ca370d51a054836007519a00ff4ce59e&photo_id=53608779187&format=json&nojsoncallback=1';
-
-function getimg(){
+function getImageUrl(photo_id) {
+    var url = img_Url_base + photo_id;
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', dataUrl, true);
+    xhr.open('GET', url, true);
     xhr.send();
-    xhr.onload = function(){
+    xhr.onload = function () {
         var data = JSON.parse(this.responseText);
-        add_new_img(data);
-    }
-}
+        var sizes = data.sizes.size;
 
-function add_new_img(dataset){
-    var gal = document.getElementById("gallery");
-    dataset.forEach(function(item){
-        console.log(item);
-        var img = document.createElement("img");
-        img.setAttribute("src", item.urls.small);
-        gal.appendChild(img); 
-    });
-}*/
+        // 找一個適合的尺寸（例如 medium 或 medium640）
+        var imgsrc = '';
+        for (var i = 0; i < sizes.length; i++) {
+            if (sizes[i].label === 'Medium' || sizes[i].label === 'Medium 640') {
+                imgsrc = sizes[i].source;
+                break;
+            }
+        }
+
+        if (imgsrc !== '') {
+            var gal = document.getElementById("gallery");
+            var img = document.createElement("img");
+            img.setAttribute("src", imgsrc);
+            gal.appendChild(img);
+        }
+    };
+}
